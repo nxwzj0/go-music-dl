@@ -1052,7 +1052,6 @@ func downloadSongWithCookie(song *model.Song, outDir string, withCover bool, wit
 	}
 
 	fileName := fmt.Sprintf("%s - %s", utils.SanitizeFilename(song.Name), utils.SanitizeFilename(song.Artist))
-	filePath := filepath.Join(outDir, fileName+".mp3")
 
 	// 2. 获取下载数据
 	var finalData []byte
@@ -1142,13 +1141,16 @@ func downloadSongWithCookie(song *model.Song, outDir string, withCover bool, wit
 	}
 
 	// 5. 内嵌元数据到 ID3（如有数据）
-	if lyricStr != "" || len(coverData) > 0 {
+	ext := core.DetectAudioExt(finalData)
+
+	if ext == "mp3" && (lyricStr != "" || len(coverData) > 0) {
 		if embeddedData, err := core.EmbedSongMetadata(finalData, song, lyricStr, coverData, coverMime); err == nil {
 			finalData = embeddedData
 		}
 	}
 
 	// 6. 写入文件
+	filePath := filepath.Join(outDir, fileName+"."+ext)
 	if err := os.WriteFile(filePath, finalData, 0644); err != nil {
 		return err
 	}

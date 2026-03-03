@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
+	"path"
 	"sort"
 	"strconv"
 	"strings"
@@ -386,7 +388,7 @@ func RegisterMusicRoutes(api *gin.RouterGroup) {
 		}
 
 		tempSong := &model.Song{ID: id, Source: source, Name: name, Artist: artist, Cover: coverURL}
-		filename := fmt.Sprintf("%s - %s.mp3", name, artist)
+		baseFilename := fmt.Sprintf("%s - %s", name, artist)
 
 		if embedMeta {
 			var audioData []byte
@@ -439,13 +441,20 @@ func RegisterMusicRoutes(api *gin.RouterGroup) {
 				coverData, coverMime, _ = core.FetchBytesWithMime(coverURL, source)
 			}
 
-			finalData, err := core.EmbedSongMetadata(audioData, tempSong, lyric, coverData, coverMime)
-			if err != nil {
-				finalData = audioData
+			ext := core.DetectAudioExt(audioData)
+			filename := fmt.Sprintf("%s.%s", baseFilename, ext)
+			contentType := core.AudioMimeByExt(ext)
+
+			finalData := audioData
+			if ext == "mp3" {
+				embeddedData, embedErr := core.EmbedSongMetadata(audioData, tempSong, lyric, coverData, coverMime)
+				if embedErr == nil {
+					finalData = embeddedData
+				}
 			}
 
 			setDownloadHeader(c, filename)
-			c.Data(200, "audio/mpeg", finalData)
+			c.Data(200, contentType, finalData)
 			return
 		}
 
@@ -474,6 +483,8 @@ func RegisterMusicRoutes(api *gin.RouterGroup) {
 				c.String(500, "Decrypt failed")
 				return
 			}
+			ext := core.DetectAudioExt(finalData)
+			filename := fmt.Sprintf("%s.%s", baseFilename, ext)
 			setDownloadHeader(c, filename)
 			http.ServeContent(c.Writer, c.Request, filename, time.Now(), bytes.NewReader(finalData))
 			return
@@ -511,6 +522,21 @@ func RegisterMusicRoutes(api *gin.RouterGroup) {
 			}
 		}
 
+		ext := core.DetectAudioExtByContentType(resp.Header.Get("Content-Type"))
+		if ext == "" {
+			if parsedURL, parseErr := url.Parse(downloadUrl); parseErr == nil {
+				suffix := strings.ToLower(strings.TrimPrefix(path.Ext(parsedURL.Path), "."))
+				switch suffix {
+				case "mp3", "flac", "ogg", "m4a":
+					ext = suffix
+				}
+			}
+		}
+		if ext == "" {
+			ext = "mp3"
+		}
+
+		filename := fmt.Sprintf("%s.%s", baseFilename, ext)
 		setDownloadHeader(c, filename)
 		c.Status(resp.StatusCode)
 		io.Copy(c.Writer, resp.Body)

@@ -436,6 +436,58 @@ func FormatSize(s int64) string {
 	return fmt.Sprintf("%.1f MB", float64(s)/1024/1024)
 }
 
+func DetectAudioExt(data []byte) string {
+	if len(data) >= 4 && bytes.Equal(data[:4], []byte{'f', 'L', 'a', 'C'}) {
+		return "flac"
+	}
+	if len(data) >= 3 && bytes.Equal(data[:3], []byte{'I', 'D', '3'}) {
+		return "mp3"
+	}
+	if len(data) >= 2 && data[0] == 0xFF && (data[1]&0xE0) == 0xE0 {
+		return "mp3"
+	}
+	if len(data) >= 4 && bytes.Equal(data[:4], []byte{'O', 'g', 'g', 'S'}) {
+		return "ogg"
+	}
+	if len(data) >= 12 && bytes.Equal(data[4:8], []byte{'f', 't', 'y', 'p'}) {
+		return "m4a"
+	}
+	return "mp3"
+}
+
+func DetectAudioExtByContentType(contentType string) string {
+	contentType = strings.TrimSpace(strings.ToLower(contentType))
+	if idx := strings.Index(contentType, ";"); idx >= 0 {
+		contentType = strings.TrimSpace(contentType[:idx])
+	}
+
+	switch contentType {
+	case "audio/flac", "audio/x-flac":
+		return "flac"
+	case "audio/mpeg", "audio/mp3", "audio/x-mp3":
+		return "mp3"
+	case "audio/ogg", "application/ogg":
+		return "ogg"
+	case "audio/mp4", "audio/x-m4a", "audio/aac", "audio/aacp":
+		return "m4a"
+	default:
+		return ""
+	}
+}
+
+func AudioMimeByExt(ext string) string {
+	switch strings.ToLower(strings.TrimSpace(ext)) {
+	case "flac":
+		return "audio/flac"
+	case "ogg":
+		return "audio/ogg"
+	case "m4a":
+		return "audio/mp4"
+	default:
+		return "audio/mpeg"
+	}
+}
+
 func IsDurationClose(a, b int) bool {
 	if a <= 0 || b <= 0 {
 		return true
