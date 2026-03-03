@@ -318,10 +318,6 @@ go-music-dl/
 * **TUI 框架**: [Bubble Tea](https://github.com/charmbracelet/bubbletea) - 终端界面
 * **桌面框架**: [Tao](https://github.com/tauri-apps/tao) + [Wry](https://github.com/tauri-apps/wry) - 跨平台桌面应用
 * **图像处理**: [image](https://github.com/image-rs/image) - 图标处理
-* **下载库**: [music-dl](https://github.com/0xHJK/music-dl) - 音乐下载库
-* **下载库**: [musicdl](https://github.com/CharlesPikachu/musicdl) - 音乐下载库
-* **无损音乐**: [Suxiaoqinx/Netease_url](https://github.com/Suxiaoqinx/Netease_url) - 网易云音乐 FLAC 无损音乐解析
-* **QQ 音乐**: [Suxiaoqinx/qqmusic_flac](https://github.com/Suxiaoqinx/qqmusic_flac) - QQ 音乐 FLAC 解析
 
 ### 桌面应用架构
 
@@ -340,6 +336,15 @@ go-music-dl/
 ## 许可证
 
 本项目遵循 GNU Affero General Public License v3.0（AGPL-3.0）。详情见 [LICENSE](LICENSE)。
+
+## 致敬
+
+感谢以下优秀的开源项目：
+
+* **下载库**: [music-dl](https://github.com/0xHJK/music-dl) - 音乐下载库
+* **下载库**: [musicdl](https://github.com/CharlesPikachu/musicdl) - 音乐下载库
+* **无损音乐**: [Suxiaoqinx/Netease_url](https://github.com/Suxiaoqinx/Netease_url) - 网易云音乐 FLAC 无损音乐解析
+* **QQ 音乐**: [Suxiaoqinx/qqmusic_flac](https://github.com/Suxiaoqinx/qqmusic_flac) - QQ 音乐 FLAC 解析
 
 ## 免责声明
 
