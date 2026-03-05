@@ -21,7 +21,7 @@ jobs:
         platform:
           - linux/amd64
           - linux/arm64
-          - linux/arm/v7  # 新增 armv7 架构支持
+          - linux/arm/v7
     steps:
       - uses: actions/checkout@v3
 
@@ -68,11 +68,7 @@ jobs:
       - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ 
-            matrix.platform == 'linux/amd64' && 'amd64' || 
-            matrix.platform == 'linux/arm64' && 'arm64' || 
-            matrix.platform == 'linux/arm/v7' && 'armv7'  
-           }} # 新增 armv7 分支
+          name: digests-${{ matrix.platform == 'linux/amd64' && 'amd64' || matrix.platform == 'linux/arm64' && 'arm64' || 'armv7' }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
